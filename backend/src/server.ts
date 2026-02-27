@@ -4,6 +4,7 @@ import { Server as SocketIOServer } from 'socket.io';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import rateLimit from 'express-rate-limit';
 
 dotenv.config();
 
@@ -22,6 +23,18 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Rate limiting
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 20,
+  message: { success: false, message: 'Too many requests, please try again later.' }
+});
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 200,
+  message: { success: false, message: 'Too many requests, please try again later.' }
+});
 
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/society_management')
   .then(() => console.log('MongoDB connected'))
@@ -54,18 +67,18 @@ import securityRoutes from './routes/security';
 import vehicleRoutes from './routes/vehicles';
 import dashboardRoutes from './routes/dashboard';
 
-app.use('/api/auth', authRoutes);
-app.use('/api/residents', residentRoutes);
-app.use('/api/units', unitRoutes);
-app.use('/api/bills', billRoutes);
-app.use('/api/payments', paymentRoutes);
-app.use('/api/facilities', facilityRoutes);
-app.use('/api/visitors', visitorRoutes);
-app.use('/api/complaints', complaintRoutes);
-app.use('/api/announcements', announcementRoutes);
-app.use('/api/security', securityRoutes);
-app.use('/api/vehicles', vehicleRoutes);
-app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/auth', authLimiter, authRoutes);
+app.use('/api/residents', apiLimiter, residentRoutes);
+app.use('/api/units', apiLimiter, unitRoutes);
+app.use('/api/bills', apiLimiter, billRoutes);
+app.use('/api/payments', apiLimiter, paymentRoutes);
+app.use('/api/facilities', apiLimiter, facilityRoutes);
+app.use('/api/visitors', apiLimiter, visitorRoutes);
+app.use('/api/complaints', apiLimiter, complaintRoutes);
+app.use('/api/announcements', apiLimiter, announcementRoutes);
+app.use('/api/security', apiLimiter, securityRoutes);
+app.use('/api/vehicles', apiLimiter, vehicleRoutes);
+app.use('/api/dashboard', apiLimiter, dashboardRoutes);
 
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error(err.stack);

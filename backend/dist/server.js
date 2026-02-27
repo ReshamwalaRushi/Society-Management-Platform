@@ -9,6 +9,7 @@ const socket_io_1 = require("socket.io");
 const mongoose_1 = __importDefault(require("mongoose"));
 const cors_1 = __importDefault(require("cors"));
 const dotenv_1 = __importDefault(require("dotenv"));
+const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const server = http_1.default.createServer(app);
@@ -24,6 +25,17 @@ app.use((0, cors_1.default)({
 }));
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
+// Rate limiting
+const authLimiter = (0, express_rate_limit_1.default)({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 20,
+    message: { success: false, message: 'Too many requests, please try again later.' }
+});
+const apiLimiter = (0, express_rate_limit_1.default)({
+    windowMs: 15 * 60 * 1000,
+    max: 200,
+    message: { success: false, message: 'Too many requests, please try again later.' }
+});
 mongoose_1.default.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/society_management')
     .then(() => console.log('MongoDB connected'))
     .catch(err => console.error('MongoDB connection error:', err));
@@ -49,18 +61,18 @@ const announcements_1 = __importDefault(require("./routes/announcements"));
 const security_1 = __importDefault(require("./routes/security"));
 const vehicles_1 = __importDefault(require("./routes/vehicles"));
 const dashboard_1 = __importDefault(require("./routes/dashboard"));
-app.use('/api/auth', auth_1.default);
-app.use('/api/residents', residents_1.default);
-app.use('/api/units', units_1.default);
-app.use('/api/bills', bills_1.default);
-app.use('/api/payments', payments_1.default);
-app.use('/api/facilities', facilities_1.default);
-app.use('/api/visitors', visitors_1.default);
-app.use('/api/complaints', complaints_1.default);
-app.use('/api/announcements', announcements_1.default);
-app.use('/api/security', security_1.default);
-app.use('/api/vehicles', vehicles_1.default);
-app.use('/api/dashboard', dashboard_1.default);
+app.use('/api/auth', authLimiter, auth_1.default);
+app.use('/api/residents', apiLimiter, residents_1.default);
+app.use('/api/units', apiLimiter, units_1.default);
+app.use('/api/bills', apiLimiter, bills_1.default);
+app.use('/api/payments', apiLimiter, payments_1.default);
+app.use('/api/facilities', apiLimiter, facilities_1.default);
+app.use('/api/visitors', apiLimiter, visitors_1.default);
+app.use('/api/complaints', apiLimiter, complaints_1.default);
+app.use('/api/announcements', apiLimiter, announcements_1.default);
+app.use('/api/security', apiLimiter, security_1.default);
+app.use('/api/vehicles', apiLimiter, vehicles_1.default);
+app.use('/api/dashboard', apiLimiter, dashboard_1.default);
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({ success: false, message: 'Internal server error' });
