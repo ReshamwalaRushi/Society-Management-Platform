@@ -1,10 +1,26 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import api from '../services/api';
 
-const AuthContext = createContext();
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  unit?: string;
+}
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+interface AuthContextType {
+  user: User | null;
+  loading: boolean;
+  login: (email: string, password: string) => Promise<any>;
+  register: (data: any) => Promise<any>;
+  logout: () => void;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -19,14 +35,14 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  const login = async (email, password) => {
+  const login = async (email: string, password: string) => {
     const res = await api.post('/auth/login', { email, password });
     localStorage.setItem('token', res.data.token);
     setUser(res.data.user);
     return res.data;
   };
 
-  const register = async (data) => {
+  const register = async (data: any) => {
     const res = await api.post('/auth/register', data);
     localStorage.setItem('token', res.data.token);
     setUser(res.data.user);
@@ -45,4 +61,8 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = (): AuthContextType => {
+  const context = useContext(AuthContext);
+  if (!context) throw new Error('useAuth must be used within AuthProvider');
+  return context;
+};

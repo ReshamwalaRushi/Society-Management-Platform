@@ -1,12 +1,25 @@
 import React from 'react';
 
-export const Card = ({ children, className = '' }) => (
-  <div className={`bg-white rounded-xl shadow-sm border border-gray-100 ${className}`}>
+interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
+  children: React.ReactNode;
+  className?: string;
+}
+
+export const Card: React.FC<CardProps> = ({ children, className = '', ...rest }) => (
+  <div className={`bg-white rounded-xl shadow-sm border border-gray-100 ${className}`} {...rest}>
     {children}
   </div>
 );
 
-export const StatCard = ({ title, value, icon: Icon, color, subtitle }) => (
+interface StatCardProps {
+  title: string;
+  value: string | number;
+  icon: React.ElementType;
+  color: string;
+  subtitle?: string;
+}
+
+export const StatCard: React.FC<StatCardProps> = ({ title, value, icon: Icon, color, subtitle }) => (
   <Card className="p-5">
     <div className="flex items-start justify-between">
       <div>
@@ -21,8 +34,12 @@ export const StatCard = ({ title, value, icon: Icon, color, subtitle }) => (
   </Card>
 );
 
-export const Badge = ({ status }) => {
-  const colors = {
+interface BadgeProps {
+  status: string;
+}
+
+export const Badge: React.FC<BadgeProps> = ({ status }) => {
+  const colors: Record<string, string> = {
     pending: 'bg-yellow-100 text-yellow-700',
     paid: 'bg-green-100 text-green-700',
     overdue: 'bg-red-100 text-red-700',
@@ -62,7 +79,14 @@ export const Badge = ({ status }) => {
   );
 };
 
-export const Modal = ({ open, onClose, title, children }) => {
+interface ModalProps {
+  open: boolean;
+  onClose: () => void;
+  title: string;
+  children: React.ReactNode;
+}
+
+export const Modal: React.FC<ModalProps> = ({ open, onClose, title, children }) => {
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -78,19 +102,28 @@ export const Modal = ({ open, onClose, title, children }) => {
   );
 };
 
-export const LoadingSpinner = () => (
+export const LoadingSpinner: React.FC = () => (
   <div className="flex items-center justify-center h-48">
     <div className="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin" />
   </div>
 );
 
-export const EmptyState = ({ message = 'No data found' }) => (
+interface EmptyStateProps {
+  message?: string;
+}
+
+export const EmptyState: React.FC<EmptyStateProps> = ({ message = 'No data found' }) => (
   <div className="flex flex-col items-center justify-center h-40 text-gray-400">
     <p className="text-sm">{message}</p>
   </div>
 );
 
-export const Input = ({ label, error, ...props }) => (
+interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  label?: string;
+  error?: string;
+}
+
+export const Input: React.FC<InputProps> = ({ label, error, ...props }) => (
   <div className="mb-4">
     {label && <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>}
     <input
@@ -101,7 +134,13 @@ export const Input = ({ label, error, ...props }) => (
   </div>
 );
 
-export const Select = ({ label, error, children, ...props }) => (
+interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
+  label?: string;
+  error?: string;
+  children: React.ReactNode;
+}
+
+export const Select: React.FC<SelectProps> = ({ label, error, children, ...props }) => (
   <div className="mb-4">
     {label && <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>}
     <select
@@ -114,7 +153,12 @@ export const Select = ({ label, error, children, ...props }) => (
   </div>
 );
 
-export const Textarea = ({ label, error, ...props }) => (
+interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
+  label?: string;
+  error?: string;
+}
+
+export const Textarea: React.FC<TextareaProps> = ({ label, error, ...props }) => (
   <div className="mb-4">
     {label && <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>}
     <textarea
@@ -126,16 +170,22 @@ export const Textarea = ({ label, error, ...props }) => (
   </div>
 );
 
-export const Button = ({ children, variant = 'primary', size = 'md', loading, ...props }) => {
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: 'primary' | 'secondary' | 'danger' | 'success' | 'outline';
+  size?: 'sm' | 'md' | 'lg';
+  loading?: boolean;
+}
+
+export const Button: React.FC<ButtonProps> = ({ children, variant = 'primary', size = 'md', loading, ...props }) => {
   const base = 'inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-colors disabled:opacity-50';
-  const variants = {
+  const variants: Record<string, string> = {
     primary: 'bg-indigo-600 text-white hover:bg-indigo-700',
     secondary: 'bg-gray-100 text-gray-700 hover:bg-gray-200',
     danger: 'bg-red-600 text-white hover:bg-red-700',
     success: 'bg-green-600 text-white hover:bg-green-700',
     outline: 'border border-gray-300 text-gray-700 hover:bg-gray-50',
   };
-  const sizes = {
+  const sizes: Record<string, string> = {
     sm: 'px-3 py-1.5 text-xs',
     md: 'px-4 py-2 text-sm',
     lg: 'px-6 py-3 text-base',

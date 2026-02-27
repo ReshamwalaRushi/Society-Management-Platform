@@ -15,7 +15,11 @@ import Complaints from './pages/Complaints';
 import Security from './pages/Security';
 import Vehicles from './pages/Vehicles';
 
-const ProtectedRoute = ({ children }) => {
+interface RouteProps {
+  children: React.ReactNode;
+}
+
+const ProtectedRoute: React.FC<RouteProps> = ({ children }) => {
   const { user, loading } = useAuth();
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -25,10 +29,10 @@ const ProtectedRoute = ({ children }) => {
   return user ? <Layout>{children}</Layout> : <Navigate to="/login" replace />;
 };
 
-const PublicRoute = ({ children }) => {
+const PublicRoute: React.FC<RouteProps> = ({ children }) => {
   const { user, loading } = useAuth();
   if (loading) return null;
-  return user ? <Navigate to="/" replace /> : children;
+  return user ? <Navigate to="/" replace /> : <>{children}</>;
 };
 
 function AppRoutes() {

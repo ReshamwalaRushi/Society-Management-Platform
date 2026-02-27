@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { DollarSign, Plus, Download, AlertTriangle, TrendingUp } from 'lucide-react';
-import { Card, StatCard, Badge, Modal, Input, Select, Button, LoadingSpinner, EmptyState } from '../components/common';
+import { DollarSign, Plus, AlertTriangle, TrendingUp } from 'lucide-react';
+import { Card, StatCard, Badge, Modal, Input, Select, Button, LoadingSpinner } from '../components/common';
 import api from '../services/api';
 import toast from 'react-hot-toast';
 
 const months = ['January', 'February', 'March', 'April', 'May', 'June',
   'July', 'August', 'September', 'October', 'November', 'December'];
 
-const Financial = () => {
-  const [bills, setBills] = useState([]);
+const Financial: React.FC = () => {
+  const [bills, setBills] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showGenModal, setShowGenModal] = useState(false);
   const [showPayModal, setShowPayModal] = useState(false);
-  const [selectedBill, setSelectedBill] = useState(null);
+  const [selectedBill, setSelectedBill] = useState<any>(null);
   const [filterStatus, setFilterStatus] = useState('');
   const [filterMonth, setFilterMonth] = useState('');
   const [saving, setSaving] = useState(false);
@@ -24,7 +24,7 @@ const Financial = () => {
 
   const fetchBills = () => {
     setLoading(true);
-    const params = {};
+    const params: any = {};
     if (filterStatus) params.status = filterStatus;
     if (filterMonth) params.month = filterMonth;
     api.get('/bills', { params })
@@ -35,7 +35,7 @@ const Financial = () => {
 
   useEffect(() => { fetchBills(); }, [filterStatus, filterMonth]);
 
-  const handleGenerate = async (e) => {
+  const handleGenerate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSaving(true);
     try {
@@ -43,17 +43,18 @@ const Financial = () => {
       toast.success(`Generated ${res.data.count} bills`);
       setShowGenModal(false);
       fetchBills();
-    } catch (err) {
+    } catch (err: any) {
       toast.error(err.response?.data?.message || 'Failed to generate bills');
     } finally {
       setSaving(false);
     }
   };
 
-  const handlePayment = async (e) => {
+  const handlePayment = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const amount = parseFloat(e.target.amount.value);
-    const method = e.target.method.value;
+    const target = e.target as typeof e.target & { amount: { value: string }; method: { value: string } };
+    const amount = parseFloat(target.amount.value);
+    const method = target.method.value;
     setSaving(true);
     try {
       await api.post('/payments/cash', { billId: selectedBill._id, amount, paymentMethod: method });
@@ -61,7 +62,7 @@ const Financial = () => {
       setShowPayModal(false);
       setSelectedBill(null);
       fetchBills();
-    } catch (err) {
+    } catch (err: any) {
       toast.error(err.response?.data?.message || 'Payment failed');
     } finally {
       setSaving(false);
@@ -94,7 +95,7 @@ const Financial = () => {
         <div className="flex flex-col sm:flex-row gap-3">
           <select
             value={filterStatus}
-            onChange={e => setFilterStatus(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFilterStatus(e.target.value)}
             className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
           >
             <option value="">All Status</option>
@@ -102,7 +103,7 @@ const Financial = () => {
           </select>
           <select
             value={filterMonth}
-            onChange={e => setFilterMonth(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFilterMonth(e.target.value)}
             className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
           >
             <option value="">All Months</option>
@@ -152,11 +153,11 @@ const Financial = () => {
       {/* Generate Bills Modal */}
       <Modal open={showGenModal} onClose={() => setShowGenModal(false)} title="Generate Maintenance Bills">
         <form onSubmit={handleGenerate}>
-          <Select label="Month" value={genForm.month} onChange={e => setGenForm({ ...genForm, month: parseInt(e.target.value) })}>
+          <Select label="Month" value={genForm.month} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setGenForm({ ...genForm, month: parseInt(e.target.value) })}>
             {months.map((m, i) => <option key={i} value={i + 1}>{m}</option>)}
           </Select>
-          <Input label="Year" type="number" value={genForm.year} onChange={e => setGenForm({ ...genForm, year: parseInt(e.target.value) })} required />
-          <Input label="Due Date" type="date" value={genForm.dueDate} onChange={e => setGenForm({ ...genForm, dueDate: e.target.value })} required />
+          <Input label="Year" type="number" value={genForm.year} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGenForm({ ...genForm, year: parseInt(e.target.value) })} required />
+          <Input label="Due Date" type="date" value={genForm.dueDate} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGenForm({ ...genForm, dueDate: e.target.value })} required />
           <p className="text-xs text-gray-500 mb-4">Bills will be generated for all occupied units using their configured monthly maintenance amount.</p>
           <Button type="submit" loading={saving} className="w-full">Generate Bills</Button>
         </form>

@@ -4,15 +4,15 @@ import { Card, Badge, Modal, Input, Select, Button, LoadingSpinner, EmptyState }
 import api from '../services/api';
 import toast from 'react-hot-toast';
 
-const Visitors = () => {
-  const [visitors, setVisitors] = useState([]);
+const Visitors: React.FC = () => {
+  const [visitors, setVisitors] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [saving, setSaving] = useState(false);
   const [filterStatus, setFilterStatus] = useState('');
   const [filterType, setFilterType] = useState('');
   const [search, setSearch] = useState('');
-  const [residents, setResidents] = useState([]);
+  const [residents, setResidents] = useState<any[]>([]);
   const [form, setForm] = useState({
     name: '', phone: '', purpose: '', type: 'visitor',
     vehicleNumber: '', hostResident: '', hostUnit: ''
@@ -20,7 +20,7 @@ const Visitors = () => {
 
   const fetchVisitors = () => {
     setLoading(true);
-    const params = {};
+    const params: any = {};
     if (filterStatus) params.status = filterStatus;
     if (filterType) params.type = filterType;
     api.get('/visitors', { params })
@@ -35,12 +35,12 @@ const Visitors = () => {
     api.get('/residents').then(res => setResidents(res.data.data || [])).catch(() => {});
   }, []);
 
-  const handleResidentChange = (residentId) => {
+  const handleResidentChange = (residentId: string) => {
     const resident = residents.find(r => r._id === residentId);
     setForm({ ...form, hostResident: residentId, hostUnit: resident?.unit?._id || '' });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSaving(true);
     try {
@@ -48,29 +48,29 @@ const Visitors = () => {
       toast.success('Visitor pre-approved successfully');
       setShowModal(false);
       fetchVisitors();
-    } catch (err) {
+    } catch (err: any) {
       toast.error(err.response?.data?.message || 'Failed to add visitor');
     } finally {
       setSaving(false);
     }
   };
 
-  const handleCheckIn = async (id) => {
+  const handleCheckIn = async (id: string) => {
     try {
       await api.put(`/visitors/${id}/checkin`);
       toast.success('Visitor checked in');
       fetchVisitors();
-    } catch (err) {
+    } catch (err: any) {
       toast.error('Failed to check in');
     }
   };
 
-  const handleCheckOut = async (id) => {
+  const handleCheckOut = async (id: string) => {
     try {
       await api.put(`/visitors/${id}/checkout`);
       toast.success('Visitor checked out');
       fetchVisitors();
-    } catch (err) {
+    } catch (err: any) {
       toast.error('Failed to check out');
     }
   };
@@ -100,16 +100,16 @@ const Visitors = () => {
               type="text"
               placeholder="Search by name or phone..."
               value={search}
-              onChange={e => setSearch(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
               className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
-          <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}
+          <select value={filterStatus} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFilterStatus(e.target.value)}
             className="border border-gray-300 rounded-lg px-3 py-2 text-sm">
             <option value="">All Status</option>
             {['pre-approved', 'checked-in', 'checked-out', 'denied'].map(s => <option key={s}>{s}</option>)}
           </select>
-          <select value={filterType} onChange={e => setFilterType(e.target.value)}
+          <select value={filterType} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFilterType(e.target.value)}
             className="border border-gray-300 rounded-lg px-3 py-2 text-sm">
             <option value="">All Types</option>
             {['visitor', 'delivery', 'cab', 'service', 'emergency'].map(t => <option key={t}>{t}</option>)}
@@ -162,17 +162,17 @@ const Visitors = () => {
 
       <Modal open={showModal} onClose={() => setShowModal(false)} title="Pre-Approve Visitor">
         <form onSubmit={handleSubmit}>
-          <Input label="Visitor Name *" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required />
-          <Input label="Phone *" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} required />
-          <Input label="Purpose *" value={form.purpose} onChange={e => setForm({ ...form, purpose: e.target.value })} required />
-          <Select label="Type" value={form.type} onChange={e => setForm({ ...form, type: e.target.value })}>
+          <Input label="Visitor Name *" value={form.name} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, name: e.target.value })} required />
+          <Input label="Phone *" value={form.phone} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, phone: e.target.value })} required />
+          <Input label="Purpose *" value={form.purpose} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, purpose: e.target.value })} required />
+          <Select label="Type" value={form.type} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setForm({ ...form, type: e.target.value })}>
             {['visitor', 'delivery', 'cab', 'service', 'emergency'].map(t => <option key={t}>{t}</option>)}
           </Select>
-          <Select label="Host Resident *" value={form.hostResident} onChange={e => handleResidentChange(e.target.value)} required>
+          <Select label="Host Resident *" value={form.hostResident} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleResidentChange(e.target.value)} required>
             <option value="">Select Resident</option>
             {residents.map(r => <option key={r._id} value={r._id}>{r.name} - Unit {r.unit?.unitNumber}</option>)}
           </Select>
-          <Input label="Vehicle Number (optional)" value={form.vehicleNumber} onChange={e => setForm({ ...form, vehicleNumber: e.target.value })} />
+          <Input label="Vehicle Number (optional)" value={form.vehicleNumber} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, vehicleNumber: e.target.value })} />
           <Button type="submit" loading={saving} className="w-full">Pre-Approve</Button>
         </form>
       </Modal>

@@ -3,10 +3,16 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import {
   Home, Users, DollarSign, Calendar, UserCheck,
-  Bell, AlertCircle, Shield, Car, LogOut, Menu, X, Building2
+  Bell, AlertCircle, Shield, Car, LogOut, Menu, Building2
 } from 'lucide-react';
 
-const navItems = [
+interface NavItem {
+  path: string;
+  icon: React.ElementType;
+  label: string;
+}
+
+const navItems: NavItem[] = [
   { path: '/', icon: Home, label: 'Dashboard' },
   { path: '/residents', icon: Users, label: 'Residents' },
   { path: '/financial', icon: DollarSign, label: 'Financial' },
@@ -18,7 +24,12 @@ const navItems = [
   { path: '/vehicles', icon: Car, label: 'Vehicles' },
 ];
 
-const Sidebar = ({ open, setOpen }) => {
+interface SidebarProps {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ open, setOpen }) => {
   const location = useLocation();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -86,7 +97,11 @@ const Sidebar = ({ open, setOpen }) => {
   );
 };
 
-const Layout = ({ children }) => {
+interface LayoutProps {
+  children: React.ReactNode;
+}
+
+const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (

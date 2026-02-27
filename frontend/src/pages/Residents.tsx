@@ -4,40 +4,45 @@ import { Card, Badge, Modal, Input, Select, Button, LoadingSpinner, EmptyState }
 import api from '../services/api';
 import toast from 'react-hot-toast';
 
-const ResidentForm = ({ onSubmit, loading }) => {
-  const [form, setForm] = useState({
+interface ResidentFormProps {
+  onSubmit: (data: any) => void;
+  loading: boolean;
+}
+
+const ResidentForm: React.FC<ResidentFormProps> = ({ onSubmit, loading }) => {
+  const [form, setForm] = useState<any>({
     name: '', email: '', phone: '', type: 'owner',
     idProofType: 'Aadhar', idProofNumber: '', moveInDate: ''
   });
-  const [units, setUnits] = useState([]);
+  const [units, setUnits] = useState<any[]>([]);
 
   useEffect(() => {
     api.get('/units').then(res => setUnits(res.data.data || [])).catch(() => {});
   }, []);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     onSubmit(form);
   };
 
   return (
     <form onSubmit={handleSubmit}>
-      <Input label="Full Name *" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required />
-      <Input label="Email *" type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} required />
-      <Input label="Phone *" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} required />
-      <Select label="Unit" value={form.unit || ''} onChange={e => setForm({ ...form, unit: e.target.value })} required>
+      <Input label="Full Name *" value={form.name} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, name: e.target.value })} required />
+      <Input label="Email *" type="email" value={form.email} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, email: e.target.value })} required />
+      <Input label="Phone *" value={form.phone} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, phone: e.target.value })} required />
+      <Select label="Unit" value={form.unit || ''} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setForm({ ...form, unit: e.target.value })} required>
         <option value="">Select Unit</option>
-        {units.map(u => <option key={u._id} value={u._id}>{u.building} - {u.unitNumber}</option>)}
+        {units.map((u: any) => <option key={u._id} value={u._id}>{u.building} - {u.unitNumber}</option>)}
       </Select>
-      <Select label="Type" value={form.type} onChange={e => setForm({ ...form, type: e.target.value })}>
+      <Select label="Type" value={form.type} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setForm({ ...form, type: e.target.value })}>
         <option value="owner">Owner</option>
         <option value="tenant">Tenant</option>
       </Select>
-      <Select label="ID Proof Type" value={form.idProofType} onChange={e => setForm({ ...form, idProofType: e.target.value })}>
+      <Select label="ID Proof Type" value={form.idProofType} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setForm({ ...form, idProofType: e.target.value })}>
         {['Aadhar', 'PAN', 'Passport', 'DrivingLicense', 'VoterID'].map(t => <option key={t}>{t}</option>)}
       </Select>
-      <Input label="ID Proof Number" value={form.idProofNumber} onChange={e => setForm({ ...form, idProofNumber: e.target.value })} />
-      <Input label="Move-In Date" type="date" value={form.moveInDate} onChange={e => setForm({ ...form, moveInDate: e.target.value })} />
+      <Input label="ID Proof Number" value={form.idProofNumber} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, idProofNumber: e.target.value })} />
+      <Input label="Move-In Date" type="date" value={form.moveInDate} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, moveInDate: e.target.value })} />
       <div className="flex gap-2 mt-2">
         <Button type="submit" loading={loading} className="flex-1">Add Resident</Button>
       </div>
@@ -45,8 +50,8 @@ const ResidentForm = ({ onSubmit, loading }) => {
   );
 };
 
-const Residents = () => {
-  const [residents, setResidents] = useState([]);
+const Residents: React.FC = () => {
+  const [residents, setResidents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -63,27 +68,27 @@ const Residents = () => {
 
   useEffect(() => { fetchResidents(); }, []);
 
-  const handleAdd = async (data) => {
+  const handleAdd = async (data: any) => {
     setSaving(true);
     try {
       await api.post('/residents', data);
       toast.success('Resident added successfully');
       setShowModal(false);
       fetchResidents();
-    } catch (err) {
+    } catch (err: any) {
       toast.error(err.response?.data?.message || 'Failed to add resident');
     } finally {
       setSaving(false);
     }
   };
 
-  const handleMoveOut = async (id) => {
+  const handleMoveOut = async (id: string) => {
     if (!window.confirm('Mark this resident as moved out?')) return;
     try {
       await api.put(`/residents/${id}/moveout`);
       toast.success('Resident moved out');
       fetchResidents();
-    } catch (err) {
+    } catch (err: any) {
       toast.error('Failed to update');
     }
   };
@@ -115,13 +120,13 @@ const Residents = () => {
               type="text"
               placeholder="Search by name, phone, email..."
               value={search}
-              onChange={e => setSearch(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
               className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
           <select
             value={filterType}
-            onChange={e => setFilterType(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFilterType(e.target.value)}
             className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
           >
             <option value="">All Types</option>

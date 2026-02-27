@@ -76,6 +76,8 @@ router.put('/:id', auth_1.protect, async (req, res) => {
 router.put('/:id/cancel', auth_1.protect, async (req, res) => {
     try {
         const booking = await FacilityBooking_1.default.findByIdAndUpdate(req.params.id, { status: 'cancelled', cancellationReason: req.body.reason }, { new: true });
+        if (!booking)
+            return res.status(404).json({ success: false, message: 'Booking not found' });
         res.json({ success: true, data: booking });
     }
     catch (err) {
@@ -85,6 +87,8 @@ router.put('/:id/cancel', auth_1.protect, async (req, res) => {
 router.put('/:id/checkin', auth_1.protect, async (req, res) => {
     try {
         const booking = await FacilityBooking_1.default.findByIdAndUpdate(req.params.id, { checkedIn: true, checkedInTime: new Date(), status: 'completed' }, { new: true });
+        if (!booking)
+            return res.status(404).json({ success: false, message: 'Booking not found' });
         res.json({ success: true, data: booking });
     }
     catch (err) {

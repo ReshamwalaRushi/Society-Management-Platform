@@ -6,12 +6,12 @@ import toast from 'react-hot-toast';
 
 const vehicleTypes = ['Car', 'Motorcycle', 'Scooter', 'Bicycle', 'Other'];
 
-const Vehicles = () => {
-  const [vehicles, setVehicles] = useState([]);
+const Vehicles: React.FC = () => {
+  const [vehicles, setVehicles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [residents, setResidents] = useState([]);
+  const [residents, setResidents] = useState<any[]>([]);
   const [form, setForm] = useState({
     type: 'Car', make: '', model: '', color: '',
     registrationNumber: '', parkingSlot: '', resident: '', unit: ''
@@ -30,12 +30,12 @@ const Vehicles = () => {
     api.get('/residents').then(res => setResidents(res.data.data || [])).catch(() => {});
   }, []);
 
-  const handleResidentChange = (residentId) => {
+  const handleResidentChange = (residentId: string) => {
     const resident = residents.find(r => r._id === residentId);
     setForm({ ...form, resident: residentId, unit: resident?.unit?._id || '' });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSaving(true);
     try {
@@ -44,25 +44,25 @@ const Vehicles = () => {
       setShowModal(false);
       setForm({ type: 'Car', make: '', model: '', color: '', registrationNumber: '', parkingSlot: '', resident: '', unit: '' });
       fetchVehicles();
-    } catch (err) {
+    } catch (err: any) {
       toast.error(err.response?.data?.message || 'Registration failed');
     } finally {
       setSaving(false);
     }
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (id: string) => {
     if (!window.confirm('Remove this vehicle?')) return;
     try {
       await api.delete(`/vehicles/${id}`);
       toast.success('Vehicle removed');
       fetchVehicles();
-    } catch (err) {
+    } catch (err: any) {
       toast.error('Failed to remove vehicle');
     }
   };
 
-  const vehicleIcons = { Car: '🚗', Motorcycle: '🏍️', Scooter: '🛵', Bicycle: '🚲', Other: '🚐' };
+  const vehicleIcons: Record<string, string> = { Car: '🚗', Motorcycle: '🏍️', Scooter: '🛵', Bicycle: '🚲', Other: '🚐' };
 
   return (
     <div className="space-y-6">
@@ -130,23 +130,23 @@ const Vehicles = () => {
 
       <Modal open={showModal} onClose={() => setShowModal(false)} title="Register Vehicle">
         <form onSubmit={handleSubmit}>
-          <Select label="Vehicle Type" value={form.type} onChange={e => setForm({ ...form, type: e.target.value })}>
+          <Select label="Vehicle Type" value={form.type} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setForm({ ...form, type: e.target.value })}>
             {vehicleTypes.map(t => <option key={t}>{t}</option>)}
           </Select>
-          <Select label="Resident *" value={form.resident} onChange={e => handleResidentChange(e.target.value)} required>
+          <Select label="Resident *" value={form.resident} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleResidentChange(e.target.value)} required>
             <option value="">Select Resident</option>
             {residents.map(r => <option key={r._id} value={r._id}>{r.name} - Unit {r.unit?.unitNumber}</option>)}
           </Select>
           <Input label="Registration Number *" value={form.registrationNumber}
-            onChange={e => setForm({ ...form, registrationNumber: e.target.value.toUpperCase() })}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, registrationNumber: e.target.value.toUpperCase() })}
             placeholder="MH 01 AB 1234" required />
           <div className="grid grid-cols-2 gap-3">
-            <Input label="Make" value={form.make} onChange={e => setForm({ ...form, make: e.target.value })} placeholder="Maruti, Bajaj..." />
-            <Input label="Model" value={form.model} onChange={e => setForm({ ...form, model: e.target.value })} placeholder="Swift, Pulsar..." />
+            <Input label="Make" value={form.make} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, make: e.target.value })} placeholder="Maruti, Bajaj..." />
+            <Input label="Model" value={form.model} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, model: e.target.value })} placeholder="Swift, Pulsar..." />
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <Input label="Color" value={form.color} onChange={e => setForm({ ...form, color: e.target.value })} placeholder="White, Black..." />
-            <Input label="Parking Slot" value={form.parkingSlot} onChange={e => setForm({ ...form, parkingSlot: e.target.value })} placeholder="A-101" />
+            <Input label="Color" value={form.color} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, color: e.target.value })} placeholder="White, Black..." />
+            <Input label="Parking Slot" value={form.parkingSlot} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, parkingSlot: e.target.value })} placeholder="A-101" />
           </div>
           <Button type="submit" loading={saving} className="w-full">Register Vehicle</Button>
         </form>

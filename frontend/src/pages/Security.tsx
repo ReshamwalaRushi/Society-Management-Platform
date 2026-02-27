@@ -6,8 +6,8 @@ import toast from 'react-hot-toast';
 
 const logTypes = ['gate-entry', 'gate-exit', 'patrol', 'incident', 'guard-attendance'];
 
-const Security = () => {
-  const [logs, setLogs] = useState([]);
+const Security: React.FC = () => {
+  const [logs, setLogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -20,7 +20,7 @@ const Security = () => {
 
   const fetchLogs = () => {
     setLoading(true);
-    const params = {};
+    const params: any = {};
     if (filterType) params.type = filterType;
     if (filterSeverity) params.severity = filterSeverity;
     api.get('/security', { params })
@@ -31,7 +31,7 @@ const Security = () => {
 
   useEffect(() => { fetchLogs(); }, [filterType, filterSeverity]);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSaving(true);
     try {
@@ -40,7 +40,7 @@ const Security = () => {
       setShowModal(false);
       setForm({ type: 'gate-entry', description: '', location: '', personName: '', vehicleNumber: '', severity: '' });
       fetchLogs();
-    } catch (err) {
+    } catch (err: any) {
       toast.error(err.response?.data?.message || 'Failed to add log');
     } finally {
       setSaving(false);
@@ -52,8 +52,8 @@ const Security = () => {
   const exits = logs.filter(l => l.type === 'gate-exit').length;
   const alerts = logs.filter(l => l.severity === 'high' || l.severity === 'critical').length;
 
-  const typeIcons = { 'gate-entry': '🔑', 'gate-exit': '🚪', 'patrol': '🔍', 'incident': '🚨', 'guard-attendance': '👮' };
-  const severityBorder = { low: 'border-l-green-400', medium: 'border-l-yellow-400', high: 'border-l-orange-500', critical: 'border-l-red-600' };
+  const typeIcons: Record<string, string> = { 'gate-entry': '🔑', 'gate-exit': '🚪', 'patrol': '🔍', 'incident': '🚨', 'guard-attendance': '👮' };
+  const severityBorder: Record<string, string> = { low: 'border-l-green-400', medium: 'border-l-yellow-400', high: 'border-l-orange-500', critical: 'border-l-red-600' };
 
   return (
     <div className="space-y-6">
@@ -76,12 +76,12 @@ const Security = () => {
 
       <Card className="p-4">
         <div className="flex flex-col sm:flex-row gap-3">
-          <select value={filterType} onChange={e => setFilterType(e.target.value)}
+          <select value={filterType} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFilterType(e.target.value)}
             className="border border-gray-300 rounded-lg px-3 py-2 text-sm">
             <option value="">All Types</option>
             {logTypes.map(t => <option key={t}>{t}</option>)}
           </select>
-          <select value={filterSeverity} onChange={e => setFilterSeverity(e.target.value)}
+          <select value={filterSeverity} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFilterSeverity(e.target.value)}
             className="border border-gray-300 rounded-lg px-3 py-2 text-sm">
             <option value="">All Severity</option>
             {['low', 'medium', 'high', 'critical'].map(s => <option key={s}>{s}</option>)}
@@ -125,17 +125,17 @@ const Security = () => {
 
       <Modal open={showModal} onClose={() => setShowModal(false)} title="Add Security Log">
         <form onSubmit={handleSubmit}>
-          <Select label="Log Type *" value={form.type} onChange={e => setForm({ ...form, type: e.target.value })}>
+          <Select label="Log Type *" value={form.type} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setForm({ ...form, type: e.target.value })}>
             {logTypes.map(t => <option key={t}>{t}</option>)}
           </Select>
-          <Input label="Person Name" value={form.personName} onChange={e => setForm({ ...form, personName: e.target.value })} placeholder="Name of person" />
-          <Input label="Vehicle Number" value={form.vehicleNumber} onChange={e => setForm({ ...form, vehicleNumber: e.target.value })} placeholder="Vehicle registration" />
-          <Input label="Location" value={form.location} onChange={e => setForm({ ...form, location: e.target.value })} placeholder="Gate 1, Parking, etc." />
-          <Select label="Severity" value={form.severity} onChange={e => setForm({ ...form, severity: e.target.value })}>
+          <Input label="Person Name" value={form.personName} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, personName: e.target.value })} placeholder="Name of person" />
+          <Input label="Vehicle Number" value={form.vehicleNumber} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, vehicleNumber: e.target.value })} placeholder="Vehicle registration" />
+          <Input label="Location" value={form.location} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, location: e.target.value })} placeholder="Gate 1, Parking, etc." />
+          <Select label="Severity" value={form.severity} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setForm({ ...form, severity: e.target.value })}>
             <option value="">None</option>
             {['low', 'medium', 'high', 'critical'].map(s => <option key={s}>{s}</option>)}
           </Select>
-          <Textarea label="Description" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} placeholder="Details about the log entry..." />
+          <Textarea label="Description" value={form.description} onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setForm({ ...form, description: e.target.value })} placeholder="Details about the log entry..." />
           <Button type="submit" loading={saving} className="w-full">Add Security Log</Button>
         </form>
       </Modal>

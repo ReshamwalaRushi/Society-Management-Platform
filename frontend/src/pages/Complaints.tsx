@@ -1,23 +1,23 @@
 import React, { useEffect, useState } from 'react';
-import { AlertCircle, Plus, Search, Filter } from 'lucide-react';
+import { AlertCircle, Plus, Search } from 'lucide-react';
 import { Card, Badge, Modal, Input, Select, Textarea, Button, LoadingSpinner, EmptyState } from '../components/common';
 import api from '../services/api';
 import toast from 'react-hot-toast';
 
 const categories = ['Plumbing', 'Electrical', 'Carpentry', 'Cleaning', 'Security', 'Lift', 'Parking', 'Garden', 'Internet', 'Other'];
 
-const Complaints = () => {
-  const [complaints, setComplaints] = useState([]);
+const Complaints: React.FC = () => {
+  const [complaints, setComplaints] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
-  const [selectedComplaint, setSelectedComplaint] = useState(null);
+  const [selectedComplaint, setSelectedComplaint] = useState<any>(null);
   const [saving, setSaving] = useState(false);
   const [filterStatus, setFilterStatus] = useState('');
   const [filterCategory, setFilterCategory] = useState('');
   const [filterPriority, setFilterPriority] = useState('');
   const [search, setSearch] = useState('');
-  const [residents, setResidents] = useState([]);
+  const [residents, setResidents] = useState<any[]>([]);
   const [form, setForm] = useState({
     title: '', description: '', category: 'Plumbing', priority: 'medium',
     resident: '', unit: ''
@@ -26,7 +26,7 @@ const Complaints = () => {
 
   const fetchComplaints = () => {
     setLoading(true);
-    const params = {};
+    const params: any = {};
     if (filterStatus) params.status = filterStatus;
     if (filterCategory) params.category = filterCategory;
     if (filterPriority) params.priority = filterPriority;
@@ -41,12 +41,12 @@ const Complaints = () => {
     api.get('/residents').then(res => setResidents(res.data.data || [])).catch(() => {});
   }, []);
 
-  const handleResidentChange = (residentId) => {
+  const handleResidentChange = (residentId: string) => {
     const resident = residents.find(r => r._id === residentId);
     setForm({ ...form, resident: residentId, unit: resident?.unit?._id || '' });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSaving(true);
     try {
@@ -54,14 +54,14 @@ const Complaints = () => {
       toast.success('Complaint submitted');
       setShowModal(false);
       fetchComplaints();
-    } catch (err) {
+    } catch (err: any) {
       toast.error(err.response?.data?.message || 'Failed to submit complaint');
     } finally {
       setSaving(false);
     }
   };
 
-  const handleStatusUpdate = async (id, status, note, assignedTo) => {
+  const handleStatusUpdate = async (id: string, status: string, note: string, assignedTo: string) => {
     try {
       await api.put(`/complaints/${id}/status`, { status, resolutionNote: note, assignedTo });
       toast.success('Status updated');
@@ -70,7 +70,7 @@ const Complaints = () => {
         const updated = await api.get(`/complaints/${id}`);
         setSelectedComplaint(updated.data.data);
       }
-    } catch (err) {
+    } catch (err: any) {
       toast.error('Failed to update status');
     }
   };
@@ -82,7 +82,7 @@ const Complaints = () => {
       setSelectedComplaint(res.data.data);
       setCommentText('');
       toast.success('Comment added');
-    } catch (err) {
+    } catch (err: any) {
       toast.error('Failed to add comment');
     }
   };
@@ -92,7 +92,7 @@ const Complaints = () => {
     c.ticketNumber?.toLowerCase().includes(search.toLowerCase())
   );
 
-  const priorityColor = { low: 'border-l-green-400', medium: 'border-l-yellow-400', high: 'border-l-orange-400', urgent: 'border-l-red-500' };
+  const priorityColor: Record<string, string> = { low: 'border-l-green-400', medium: 'border-l-yellow-400', high: 'border-l-orange-400', urgent: 'border-l-red-500' };
 
   return (
     <div className="space-y-6">
@@ -110,20 +110,20 @@ const Complaints = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <div className="relative">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search..."
+            <input value={search} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)} placeholder="Search..."
               className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg text-sm" />
           </div>
-          <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}
+          <select value={filterStatus} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFilterStatus(e.target.value)}
             className="border border-gray-300 rounded-lg px-3 py-2 text-sm">
             <option value="">All Status</option>
             {['open', 'in-progress', 'resolved', 'closed'].map(s => <option key={s}>{s}</option>)}
           </select>
-          <select value={filterCategory} onChange={e => setFilterCategory(e.target.value)}
+          <select value={filterCategory} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFilterCategory(e.target.value)}
             className="border border-gray-300 rounded-lg px-3 py-2 text-sm">
             <option value="">All Categories</option>
             {categories.map(c => <option key={c}>{c}</option>)}
           </select>
-          <select value={filterPriority} onChange={e => setFilterPriority(e.target.value)}
+          <select value={filterPriority} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFilterPriority(e.target.value)}
             className="border border-gray-300 rounded-lg px-3 py-2 text-sm">
             <option value="">All Priority</option>
             {['low', 'medium', 'high', 'urgent'].map(p => <option key={p}>{p}</option>)}
@@ -163,17 +163,17 @@ const Complaints = () => {
       {/* New Complaint Modal */}
       <Modal open={showModal} onClose={() => setShowModal(false)} title="Submit New Complaint">
         <form onSubmit={handleSubmit}>
-          <Input label="Title *" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} required />
-          <Textarea label="Description *" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} rows={3} required />
+          <Input label="Title *" value={form.title} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, title: e.target.value })} required />
+          <Textarea label="Description *" value={form.description} onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setForm({ ...form, description: e.target.value })} rows={3} required />
           <div className="grid grid-cols-2 gap-3">
-            <Select label="Category" value={form.category} onChange={e => setForm({ ...form, category: e.target.value })}>
+            <Select label="Category" value={form.category} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setForm({ ...form, category: e.target.value })}>
               {categories.map(c => <option key={c}>{c}</option>)}
             </Select>
-            <Select label="Priority" value={form.priority} onChange={e => setForm({ ...form, priority: e.target.value })}>
+            <Select label="Priority" value={form.priority} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setForm({ ...form, priority: e.target.value })}>
               {['low', 'medium', 'high', 'urgent'].map(p => <option key={p}>{p}</option>)}
             </Select>
           </div>
-          <Select label="Resident" value={form.resident} onChange={e => handleResidentChange(e.target.value)} required>
+          <Select label="Resident" value={form.resident} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleResidentChange(e.target.value)} required>
             <option value="">Select Resident</option>
             {residents.map(r => <option key={r._id} value={r._id}>{r.name} - Unit {r.unit?.unitNumber}</option>)}
           </Select>
@@ -219,7 +219,7 @@ const Complaints = () => {
               <div className="border-t pt-3">
                 <p className="text-sm font-medium text-gray-700 mb-2">Comments</p>
                 <div className="space-y-2">
-                  {selectedComplaint.comments.map((c, i) => (
+                  {selectedComplaint.comments.map((c: any, i: number) => (
                     <div key={i} className="bg-gray-50 rounded-lg px-3 py-2">
                       <p className="text-sm text-gray-700">{c.text}</p>
                       <p className="text-xs text-gray-400 mt-1">{new Date(c.createdAt).toLocaleString('en-IN')}</p>
@@ -229,7 +229,7 @@ const Complaints = () => {
               </div>
             )}
             <div className="flex gap-2">
-              <input value={commentText} onChange={e => setCommentText(e.target.value)}
+              <input value={commentText} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCommentText(e.target.value)}
                 placeholder="Add a comment..." className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm" />
               <Button onClick={handleAddComment}>Post</Button>
             </div>

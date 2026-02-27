@@ -5,20 +5,20 @@ import { Input, Select, Button } from '../components/common';
 import { Building2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-const Register = () => {
+const Register: React.FC = () => {
   const { register } = useAuth();
   const navigate = useNavigate();
   const [form, setForm] = useState({ name: '', email: '', password: '', phone: '', role: 'resident' });
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     try {
       await register(form);
       toast.success('Registration successful!');
       navigate('/');
-    } catch (err) {
+    } catch (err: any) {
       toast.error(err.response?.data?.message || 'Registration failed');
     } finally {
       setLoading(false);
@@ -37,11 +37,11 @@ const Register = () => {
           <h1 className="text-2xl font-bold text-gray-800">Create Account</h1>
         </div>
         <form onSubmit={handleSubmit}>
-          <Input label="Full Name" placeholder="John Doe" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required />
-          <Input label="Email" type="email" placeholder="john@example.com" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} required />
-          <Input label="Phone" placeholder="+91 9876543210" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} required />
-          <Input label="Password" type="password" placeholder="Min 6 characters" value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} required minLength={6} />
-          <Select label="Role" value={form.role} onChange={e => setForm({ ...form, role: e.target.value })}>
+          <Input label="Full Name" placeholder="John Doe" value={form.name} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, name: e.target.value })} required />
+          <Input label="Email" type="email" placeholder="john@example.com" value={form.email} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, email: e.target.value })} required />
+          <Input label="Phone" placeholder="+91 9876543210" value={form.phone} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, phone: e.target.value })} required />
+          <Input label="Password" type="password" placeholder="Min 6 characters" value={form.password} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, password: e.target.value })} required minLength={6} />
+          <Select label="Role" value={form.role} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setForm({ ...form, role: e.target.value })}>
             <option value="resident">Resident</option>
             <option value="admin">Admin</option>
             <option value="manager">Manager</option>

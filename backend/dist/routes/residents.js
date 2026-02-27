@@ -68,6 +68,8 @@ router.delete('/:id', auth_1.protect, (0, auth_1.authorize)('admin'), async (req
 router.put('/:id/moveout', auth_1.protect, (0, auth_1.authorize)('admin', 'manager'), async (req, res) => {
     try {
         const resident = await Resident_1.default.findByIdAndUpdate(req.params.id, { moveOutDate: new Date(), isActive: false }, { new: true });
+        if (!resident)
+            return res.status(404).json({ success: false, message: 'Resident not found' });
         res.json({ success: true, data: resident });
     }
     catch (err) {

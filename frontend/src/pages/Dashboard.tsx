@@ -3,8 +3,8 @@ import { Users, DollarSign, AlertCircle, UserCheck, Calendar, Shield, Building2,
 import { StatCard, Card, Badge, LoadingSpinner } from '../components/common';
 import api from '../services/api';
 
-const Dashboard = () => {
-  const [stats, setStats] = useState(null);
+const Dashboard: React.FC = () => {
+  const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -40,7 +40,6 @@ const Dashboard = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Recent Announcements */}
         <Card className="p-5">
           <div className="flex items-center gap-2 mb-4">
             <Bell size={18} className="text-indigo-600" />
@@ -48,7 +47,7 @@ const Dashboard = () => {
           </div>
           {stats?.recentAnnouncements?.length > 0 ? (
             <div className="space-y-3">
-              {stats.recentAnnouncements.map(a => (
+              {stats.recentAnnouncements.map((a: any) => (
                 <div key={a._id} className="border-l-4 border-indigo-400 pl-3 py-1">
                   <div className="flex items-center justify-between">
                     <p className="text-sm font-medium text-gray-700">{a.title}</p>
@@ -65,7 +64,6 @@ const Dashboard = () => {
           )}
         </Card>
 
-        {/* Bill Stats */}
         <Card className="p-5">
           <div className="flex items-center gap-2 mb-4">
             <DollarSign size={18} className="text-green-600" />
@@ -73,7 +71,7 @@ const Dashboard = () => {
           </div>
           {stats?.billStats?.length > 0 ? (
             <div className="space-y-2">
-              {stats.billStats.map(stat => (
+              {stats.billStats.map((stat: any) => (
                 <div key={stat._id} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
                   <div className="flex items-center gap-2">
                     <Badge status={stat._id} />
