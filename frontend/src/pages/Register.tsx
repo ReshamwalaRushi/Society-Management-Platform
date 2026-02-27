@@ -17,7 +17,7 @@ const Register: React.FC = () => {
     try {
       await register(form);
       toast.success('Registration successful!');
-      navigate('/');
+      navigate('/dashboard');
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Registration failed');
     } finally {
